@@ -1,103 +1,104 @@
-import Image from "next/image";
+'use client';
+import { useState } from 'react';
+import { PhotographersList } from '@/components/PhotographersList';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { setPendingTag, applyFilters } from '@/redux/slices/filterSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
+import { Button } from '@/components/ui/button';
+import FilterSidebar from '@/components/FilterSidebar';
+import { Filter } from 'lucide-react';
 
-export default function Home() {
+const Page = () => {
+  const [isFilterSidebarOpen, setIsFilterSidebarOpen] = useState(false);
+  const dispatch = useDispatch();
+  const selectedTag = useSelector((state: RootState) => state.filter.tag);
+  const selectedCity = useSelector((state: RootState) => state.filter.city);
+
+  function getHeading(type: string, city: string) {
+    const hasValidType = type && type.toLowerCase() !== "all";
+  
+    if (hasValidType && city) {
+      return `${type} Photographers in ${city}`;
+    } else if (hasValidType) {
+      return `Best ${type} Photographers Near You`;
+    } else if (city) {
+      return `Top Photographers in ${city}`;
+    } else {
+      return `Find the Best Photographers for Every Occasion`;
+    }
+  }
+  
+  function getSubheading(type: string, city: string) {
+    const hasValidType = type && type.toLowerCase() !== "all";
+  
+    if (hasValidType && city) {
+      return `Browse ${city}'s best ${type.toLowerCase()} photographers — view portfolios, pricing, and reviews.`;
+    } else if (hasValidType) {
+      return `Explore top-rated ${type.toLowerCase()} photographers with trusted reviews and creative portfolios.`;
+    } else if (city) {
+      return `Discover professional photographers in ${city} for weddings, maternity, birthdays, and more — all reviewed and rated.`;
+    } else {
+      return `Explore verified professionals for weddings, maternity, birthdays, and more — all in one place.`;
+    }
+  }
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="min-h-screen bg-background">
+      <main className="flex">
+        {/* Main Content */}
+        <div className="flex-1 transition-all duration-300">
+          <div className='mb-4 p-7 shadow-xl'>
+            <h1 className="text-2xl font-bold mb-2">{getHeading(selectedTag, selectedCity)}</h1>
+            <p className="text-gray-600 text-[16px] mb-5">{getSubheading(selectedTag, selectedCity)}</p>
+            
+            <div className="flex items-center justify-between">
+              <Select onValueChange={(value) => {
+                dispatch(setPendingTag(value as "all" | "Candid" | "Maternity" | "Newborn" | "Birthday" | "Wedding" | "Pre-wedding" | "Couple" | "Family" | "Engagement" | "Fashion" | "Portfolio"));
+                dispatch(applyFilters());
+              }}>
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  <SelectItem value="Candid">Candid</SelectItem>
+                  <SelectItem value="Maternity">Maternity</SelectItem>
+                  <SelectItem value="Newborn">Newborn</SelectItem>
+                  <SelectItem value="Birthday">Birthday</SelectItem>
+                  <SelectItem value="Wedding">Wedding</SelectItem>
+                  <SelectItem value="Pre-wedding">Pre-wedding</SelectItem>
+                  <SelectItem value="Couple">Couple</SelectItem>
+                  <SelectItem value="Family">Family</SelectItem>
+                  <SelectItem value="Engagement">Engagement</SelectItem>
+                  <SelectItem value="Fashion">Fashion</SelectItem>
+                  <SelectItem value="Portfolio">Portfolio</SelectItem>
+                </SelectContent>
+              </Select>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+              <Button 
+                variant="outline" 
+                className='bg-white text-gray-700 py-3 px-4 rounded-lg font-medium hover:border-gray-400 transition-colors border border-gray-300 flex items-center gap-2'
+                onClick={() => setIsFilterSidebarOpen(true)}
+              >
+                <Filter className="w-4 h-4" />
+                Filters
+              </Button>
+            </div>
+          </div>
+
+          <div className='p-6'>
+            <PhotographersList />
+          </div>
         </div>
+
+        {/* Filter Sidebar */}
+        <FilterSidebar 
+          isOpen={isFilterSidebarOpen} 
+          onClose={() => setIsFilterSidebarOpen(false)} 
+        />
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
-  );
+  )
 }
+export default Page;
